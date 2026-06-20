@@ -28,6 +28,9 @@ $RECYCLE.BIN/
 # 构建产物
 dist/
 build/
+bin/
+obj/
+GameDevMind.sln
 *.pdf
 *.epub
 

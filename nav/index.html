@@ -66,8 +66,13 @@ body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkM
 .empty { text-align:center; padding:48px; color:var(--muted); }
 .paths-section { margin-top:32px; }
 .paths-section h2 { font-size:1.1rem; margin-bottom:16px; color:var(--text); }
-.path-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px; margin-bottom:12px; }
+.path-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px; margin-bottom:12px; cursor:pointer; transition:border-color .2s,box-shadow .2s; }
+.path-card:hover { border-color:var(--accent); }
+.path-card.active { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent); }
 .path-card h3 { font-size:.9rem; color:var(--accent); margin-bottom:8px; }
+.path-card .path-desc { font-size:.78rem; color:var(--muted); margin-bottom:10px; }
+.path-guide { font-size:.82rem; margin-bottom:16px; }
+.path-guide a { color:var(--accent); }
 .path-flow { display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
 .path-step { padding:4px 12px; border-radius:12px; font-size:.78rem; font-weight:600; }
 .path-arrow { color:var(--muted); font-size:.8rem; }
@@ -124,7 +129,7 @@ const DOCS=[
   {t:'编程语言',p:'mds/1.基础能力/1.1.编程语言.md',c:1,l:0,r:''},
   {t:'编程语言基础概念',p:'mds/1.基础能力/1.1.1.编程语言基础概念.md',c:1,l:1,r:'客户端,服务端'},
   {t:'C++语言',p:'mds/1.基础能力/1.1.2.C++语言.md',c:1,l:2,r:'客户端,服务端',code:'code/1.基础能力/1.1.2.C++语言/'},
-  {t:'C#语言',p:'mds/1.基础能力/1.1.3.C#语言.md',c:1,l:1,r:'客户端'},
+  {t:'C#语言',p:'mds/1.基础能力/1.1.3.C#语言.md',c:1,l:1,r:'客户端',code:'code/1.基础能力/1.1.3.C#语言/object_pool/'},
   {t:'JS语言',p:'mds/1.基础能力/1.1.4.JS语言.md',c:1,l:1,r:'客户端'},
   {t:'编程语言综合',p:'mds/1.基础能力/1.1.5.编程语言综合.md',c:1,l:2,r:'客户端,服务端'},
   {t:'内存管理',p:'mds/1.基础能力/1.1.6.内存管理.md',c:1,l:2,r:'客户端,服务端'},
@@ -190,7 +195,7 @@ const DOCS=[
   {t:'工具开发',p:'mds/4.生产能力/4.2.工具开发.md',c:4,l:0,r:''},
   {t:'编辑器开发',p:'mds/4.生产能力/4.2.1.编辑器开发.md',c:4,l:3,r:'客户端'},
   {t:'工具开发与应用',p:'mds/4.生产能力/4.2.2.工具开发与应用.md',c:4,l:2,r:'客户端,服务端'},
-  {t:'游戏数据文件',p:'mds/4.生产能力/4.2.3.游戏数据文件.md',c:4,l:2,r:'客户端,服务端'},
+  {t:'游戏数据文件',p:'mds/4.生产能力/4.2.3.游戏数据文件.md',c:4,l:2,r:'客户端,服务端',code:'code/4.生产能力/4.2.3.游戏数据文件/excel_to_json/'},
   {t:'技术中台',p:'mds/4.生产能力/4.3.技术中台.md',c:4,l:0,r:''},
   {t:'快速开发框架',p:'mds/4.生产能力/4.3.1.快速开发框架.md',c:4,l:2,r:'客户端,服务端'},
   {t:'技术支持',p:'mds/4.生产能力/4.3.2.技术支持.md',c:4,l:2,r:'客户端,服务端'},
@@ -223,7 +228,7 @@ const DOCS=[
   {t:'产品运营支持',p:'mds/6.运营能力/6.2.产品运营支持.md',c:6,l:0,r:''},
   {t:'GM后台',p:'mds/6.运营能力/6.2.1.GM后台.md',c:6,l:2,r:'服务端'},
   {t:'数据统计分析',p:'mds/6.运营能力/6.2.2.数据统计分析.md',c:6,l:2,r:'服务端'},
-  {t:'产品热更新',p:'mds/6.运营能力/6.2.3.产品热更新.md',c:6,l:2,r:'客户端,服务端'},
+  {t:'产品热更新',p:'mds/6.运营能力/6.2.3.产品热更新.md',c:6,l:2,r:'客户端,服务端',code:'code/6.运营能力/6.2.3.产品热更新/hotupdate_client/'},
   {t:'产品本地化',p:'mds/6.运营能力/6.2.4.产品本地化.md',c:6,l:2,r:'客户端,服务端'},
   {t:'开发配合',p:'mds/6.运营能力/6.2.5.开发配合.md',c:6,l:2,r:'客户端,服务端'},
   {t:'AI助力游戏运营',p:'mds/6.运营能力/6.2.6.AI助力游戏运营.md',c:6,l:2,r:'客户端,服务端'},
@@ -237,12 +242,47 @@ const DOCS=[
 const LEVELS=['','初级','中级','高级'];
 const ROLES=['客户端','服务端'];
 
-let activeCat=0, activeLevels=new Set(), activeRoles=new Set(), search='';
+const LEARNING_PATHS=[
+  {id:'a',title:'🎓 路径 A：新人入门',desc:'在校生、转行者 · 建立全景认知',paths:new Set([
+    'mds/1.基础能力/1.1.1.编程语言基础概念.md','mds/1.基础能力/1.1.2.C++语言.md','mds/1.基础能力/1.1.3.C#语言.md',
+    'mds/1.基础能力/1.2.2.数据结构.md','mds/1.基础能力/1.2.3.算法.md','mds/1.基础能力/1.2.1.设计模式.md',
+    'mds/2.技术能力/2.1.6.游戏引擎概念与应用.md','mds/2.技术能力/2.1.3.UI.md','mds/2.技术能力/2.1.1.图形与渲染.md',
+    'mds/2.技术能力/2.3.2.客户端开发工具.md','mds/2.技术能力/2.2.1.网络与通信.md','mds/2.技术能力/2.2.2.数据库.md',
+    'mds/2.技术能力/2.3.3.服务端开发工具.md','mds/3.研发能力/3.3.2.角色.md','mds/3.研发能力/3.3.1.摄像机控制.md',
+    'mds/6.运营能力/6.2.3.产品热更新.md','mds/6.运营能力/6.3.2.帐号与支付.md','mds/5.管理能力/5.1.1.系统开发工作流.md'
+  ])},
+  {id:'b',title:'💻 路径 B：研发实战',desc:'1～5 年程序员 · 补盲区、做架构决策',paths:new Set([
+    'mds/3.研发能力/3.1.1.客户端底层通用系统.md','mds/3.研发能力/3.1.4.客户端网络系统.md','mds/3.研发能力/3.1.7.客户端中间件.md',
+    'mds/3.研发能力/3.1.6.UI系统.md','mds/3.研发能力/3.1.5.渲染与特效.md','mds/3.研发能力/3.1.2.客户端3D场景开发.md',
+    'mds/3.研发能力/3.1.3.客户端优化.md','mds/3.研发能力/3.3.2.角色.md','mds/3.研发能力/3.3.3.综合业务层功能.md',
+    'mds/3.研发能力/3.2.2.网游网络同步.md','mds/3.研发能力/3.2.1.服务端底层架构.md','mds/3.研发能力/3.2.5.服务端业务架构.md',
+    'mds/3.研发能力/3.2.4.服务端基础功能.md','mds/2.技术能力/2.2.3.服务端中间件.md','mds/2.技术能力/2.2.1.网络与通信.md',
+    'mds/2.技术能力/2.2.2.数据库.md','mds/3.研发能力/3.2.3.服务端优化.md',
+    'mds/4.生产能力/4.2.3.游戏数据文件.md','mds/4.生产能力/4.2.1.编辑器开发.md','mds/4.生产能力/4.2.2.工具开发与应用.md',
+    'mds/4.生产能力/4.1.2.AI助力游戏生产.md','mds/4.生产能力/4.3.3.DevOps.md','mds/5.管理能力/5.1.1.系统开发工作流.md'
+  ])},
+  {id:'c',title:'🚀 路径 C：上线运营',desc:'主程/CTO · 从能跑到能运营',paths:new Set([
+    'mds/6.运营能力/6.2.3.产品热更新.md','mds/6.运营能力/6.3.2.帐号与支付.md','mds/6.运营能力/6.3.4.产品合规.md',
+    'mds/6.运营能力/6.3.1.游戏安全.md','mds/6.运营能力/6.1.1.网络维护.md','mds/6.运营能力/6.1.2.数据存储.md',
+    'mds/6.运营能力/6.1.5.中间件运维.md','mds/6.运营能力/6.1.6.网络安全.md','mds/4.生产能力/4.3.3.DevOps.md',
+    'mds/6.运营能力/6.2.1.GM后台.md','mds/6.运营能力/6.2.2.数据统计分析.md','mds/6.运营能力/6.2.5.开发配合.md',
+    'mds/6.运营能力/6.2.4.产品本地化.md','mds/6.运营能力/6.2.6.AI助力游戏运营.md','mds/6.运营能力/6.2.7.LiveOps.md',
+    'mds/5.管理能力/5.3.2.版本管理.md','mds/5.管理能力/5.2.1.代码质量管理.md','mds/5.管理能力/5.2.2.产品质量管理.md'
+  ])}
+];
+
+let activeCat=0, activeLevels=new Set(), activeRoles=new Set(), search='', activePath=null;
 
 function toggleFilter(type,val,el){
   const s=type==='level'?activeLevels:activeRoles;
   s.has(val)?s.delete(val):s.add(val);
   el.classList.toggle('active',s.has(val));
+  render();
+}
+
+function selectPath(id){
+  activePath=activePath===id?null:id;
+  if(activePath)activeCat=0;
   render();
 }
 
@@ -258,6 +298,10 @@ function render(){
   // Filter
   search=document.getElementById('search').value.toLowerCase();
   let filtered=DOCS.filter(d=>{
+    if(activePath){
+      const pathSet=LEARNING_PATHS.find(p=>p.id===activePath).paths;
+      if(!pathSet.has(d.p))return false;
+    }
     if(activeCat>0&&d.c!==activeCat+1)return false;
     if(search&&!d.t.toLowerCase().includes(search))return false;
     if(activeLevels.size>0&&!activeLevels.has(LEVELS[d.l]))return false;
@@ -268,7 +312,8 @@ function render(){
     return true;
   });
 
-  document.getElementById('stats').textContent=`显示 ${filtered.length} / ${DOCS.length} 篇文档${search?` (搜索: "${search}")`:''}`;
+  const pathLabel=activePath?` · ${LEARNING_PATHS.find(p=>p.id===activePath).title}`:'';
+  document.getElementById('stats').textContent=`显示 ${filtered.length} / ${DOCS.length} 篇文档${pathLabel}${search?` (搜索: "${search}")`:''}`;
 
   // List
   if(filtered.length===0){
@@ -289,44 +334,29 @@ function render(){
     }).join('');
   }
 
-  // Paths
+  // Paths — 点击筛选，再点取消
   document.getElementById('paths').innerHTML=`
-    <div class="path-card">
-      <h3>🎓 游戏开发新人路径</h3>
+    <p class="path-guide">完整清单见 <a href="../mds/topics/推荐阅读路径.md">推荐阅读路径.md</a>（含必读/选读标记与配套资源）</p>
+    ${LEARNING_PATHS.map(p=>`
+    <div class="path-card ${activePath===p.id?'active':''}" onclick="selectPath('${p.id}')">
+      <h3>${p.title}</h3>
+      <div class="path-desc">${p.desc} · ${p.paths.size} 篇核心文档</div>
       <div class="path-flow">
-        <span class="path-step c1">基础能力</span><span class="path-arrow">→</span>
-        <span class="path-step c3">客户端/服务端研发</span><span class="path-arrow">→</span>
-        <span class="path-step c2">技术能力（引擎选择）</span><span class="path-arrow">→</span>
-        <span class="path-step c4">生产能力</span>
+        ${p.id==='a'?`
+        <span class="path-step c1">编程基础</span><span class="path-arrow">→</span>
+        <span class="path-step c2">引擎/UI</span><span class="path-arrow">→</span>
+        <span class="path-step c3">第一个 Demo</span><span class="path-arrow">→</span>
+        <span class="path-step c6">上线认知</span>`:''}
+        ${p.id==='b'?`
+        <span class="path-step c3">客户端/服务端</span><span class="path-arrow">→</span>
+        <span class="path-step c3">网络同步</span><span class="path-arrow">→</span>
+        <span class="path-step c4">工具链</span>`:''}
+        ${p.id==='c'?`
+        <span class="path-step c6">上线必查</span><span class="path-arrow">→</span>
+        <span class="path-step c6">运维底座</span><span class="path-arrow">→</span>
+        <span class="path-step c6">运营支撑</span>`:''}
       </div>
-    </div>
-    <div class="path-card">
-      <h3>💻 客户端开发路径</h3>
-      <div class="path-flow">
-        <span class="path-step c1">编程语言+数据结构</span><span class="path-arrow">→</span>
-        <span class="path-step c2">图形渲染+引擎</span><span class="path-arrow">→</span>
-        <span class="path-step c3">客户端架构+优化</span><span class="path-arrow">→</span>
-        <span class="path-step c4">工具开发</span>
-      </div>
-    </div>
-    <div class="path-card">
-      <h3>🖥️ 服务端开发路径</h3>
-      <div class="path-flow">
-        <span class="path-step c1">网络+操作系统</span><span class="path-arrow">→</span>
-        <span class="path-step c2">网络通信+数据库</span><span class="path-arrow">→</span>
-        <span class="path-step c3">服务端架构+网络同步</span><span class="path-arrow">→</span>
-        <span class="path-step c6">运维+运营</span>
-      </div>
-    </div>
-    <div class="path-card">
-      <h3>👔 技术管理路径</h3>
-      <div class="path-flow">
-        <span class="path-step c5">工作流+质量保障</span><span class="path-arrow">→</span>
-        <span class="path-step c5">项目管理+SCRUM</span><span class="path-arrow">→</span>
-        <span class="path-step c5">团队管理+组织</span><span class="path-arrow">→</span>
-        <span class="path-step c6">产品运营</span>
-      </div>
-    </div>
+    </div>`).join('')}
   `;
 }
 
