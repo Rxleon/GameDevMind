@@ -14,6 +14,10 @@
     &nbsp;|&nbsp;
     <a href="mds/阅读说明.md">阅读说明</a>
     &nbsp;|&nbsp;
+    <a href="INDEX.md">📑 文档索引</a>
+    &nbsp;|&nbsp;
+    <a href="HISTORY.md">📋 更新日志</a>
+    &nbsp;|&nbsp;
     <a href="https://gonglei007.github.io/GameDevMind/nav/">🔍 交互式导航</a>
     &nbsp;|&nbsp;
     <a href="https://gonglei007.github.io/GameDevMind/nav/panorama.html">🗺️ 全景图</a>
@@ -77,6 +81,7 @@
 
 * [mds/阅读说明.md](mds/阅读说明.md) — 内容结构、文档格式、推荐阅读路径、如何配合 AI 使用
 * [mds/topics/推荐阅读路径.md](mds/topics/推荐阅读路径.md) — **三条主路径**（新人入门 / 研发实战 / 上线运营）详细文档清单
+* [INDEX.md](INDEX.md) · [KEYWORDS.md](KEYWORDS.md) · [HISTORY.md](HISTORY.md) · [常见问题](mds/topics/常见问题.md)
 
 <br/>
 

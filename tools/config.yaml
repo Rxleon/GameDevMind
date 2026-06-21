@@ -1,0 +1,33 @@
+# GameDevMind 工具统一配置
+# 各脚本通过 tools/check/lib_config.py 读取
+
+repo:
+  mds_dir: mds
+  exports_dir: exports
+  images_dir: images
+  cases_dir: cases
+  code_dir: code
+  ai_cases_dir: ai-cases
+
+check:
+  # 叶子文档：文件名含三段编号，如 1.1.1.标题.md
+  leaf_doc_pattern: '^\d+\.\d+\.\d+.+\.md$'
+  skip_filenames:
+    - 阅读说明.md
+  skip_dir_names:
+    - topics
+    - 一站式手游创业
+  require_keywords: true
+  require_tags: true
+  warn_raw_true: true
+  warn_trailing_whitespace: true
+
+images:
+  scan_dirs:
+    - exports
+    - images
+  large_file_kb: 500
+
+paths:
+  template: template/z.模板.md
+  naming_doc: docs/文档命名规范.md

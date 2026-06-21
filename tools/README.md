@@ -25,6 +25,12 @@ tools/
 │   ├── smart-agent-batch.js
 │   ├── smart-agent-config.example.json
 │   └── package.json
+├── check/             # 文档与图片质量检查
+│   ├── check_docs.py
+│   ├── check_images.py
+│   ├── generate_keywords.py
+│   └── README.md
+├── config.yaml        # 工具统一配置
 ├── test.sh            # 测试脚本
 └── README.md          # 本文件
 ```
@@ -373,6 +379,24 @@ node smart-agent-batch.js
 - 检查网络连接
 - 查看错误信息和执行报告
 
+## ✅ 文档质量检查 (`check/`)
+
+提交文档 PR 前建议运行：
+
+```bash
+pip install -r tools/check/requirements.txt
+python tools/check/check_docs.py
+python tools/check/check_images.py
+```
+
+| 脚本 | 说明 |
+|------|------|
+| `check_docs.py` | 关键词/标签、图片路径、编码 |
+| `check_images.py` | 缺失引用、未引用文件、大 PNG |
+| `generate_keywords.py` | 生成 `KEYWORDS.md` |
+
+配置：[config.yaml](config.yaml) · 说明：[check/README.md](check/README.md)
+
 ## 🔮 未来计划
 
 - [x] 添加 PowerShell 版本的脚本（XMind 转换）
@@ -381,6 +405,7 @@ node smart-agent-batch.js
 - [x] 添加更详细的错误处理（Smart API 脚本）
 - [x] 添加进度显示（XMind 转换、Smart API 脚本）
 - [x] 整理工具目录结构
+- [x] 文档/图片检查脚本与统一 config.yaml
 - [ ] 添加单元测试
 - [ ] 添加包装脚本，支持从项目根目录运行
 
@@ -404,4 +429,4 @@ node smart-agent-batch.js
 
 ---
 
-*最后更新：2024年*
+*最后更新：2026-06*

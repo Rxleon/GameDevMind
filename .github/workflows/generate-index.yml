@@ -5,6 +5,7 @@ on:
     branches: [ main ]
     paths:
       - 'mds/**'
+      - 'tools/check/generate_keywords.py'
       - '.github/workflows/generate-index.yml'
   workflow_dispatch:
 
@@ -142,6 +143,17 @@ jobs:
           echo "" >> INDEX_NEW.md
           echo "*此索引由 GitHub Actions 自动生成*" >> INDEX_NEW.md
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install check dependencies
+        run: pip install -r tools/check/requirements.txt
+
+      - name: Generate keyword index
+        run: python tools/check/generate_keywords.py
+
       - name: Compare and update index
         run: |
           if [ -f "INDEX.md" ]; then
@@ -166,6 +178,13 @@ jobs:
             git add INDEX.md
             git commit -m "docs: 自动生成文档索引 [skip ci]"
             git push
+          fi
+
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -f "KEYWORDS.md" ]; then
+            git add KEYWORDS.md
+            git diff --cached --quiet || { git commit -m "docs: 自动更新关键词索引 [skip ci]"; git push; } || true
           fi
 
       - name: Summary
